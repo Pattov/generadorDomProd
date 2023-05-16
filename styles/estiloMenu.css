@@ -1,0 +1,66 @@
+body {
+  background-color: #FFFFFF;
+  color: #0C0C0D;
+  margin: 0;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+.logo span {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-left: 0.5em;
+}
+.logo img {
+  width: 4em;
+  padding-left: 2em;
+}
+
+.contenedorMenu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid #d5d8d4;
+  background-color: #FFFFFF;
+}
+
+.menu {
+  margin: 0.5rem 1rem;
+  padding-right: 10px;
+}
+.menu:hover {
+  background-color: #d5d8d4;
+  color: #0C0C0D;
+  border-radius: 10px;
+}
+
+.iconos {
+  margin-left: 2;
+}
+.iconos i {
+  font-size: 1.5em;
+  padding-right: 0.5em;
+}
+.iconos i:hover {
+  color: #18F276;
+}
+
+label {
+  cursor: pointer;
+}
+
+#theme {
+  display: none;
+}
+
+.oscuro {
+  background-color: #0C0C0D;
+  color: #FFFFFF;
+}
+.oscuro .contenedorMenu {
+  background-color: #0C0C0D;
+}/*# sourceMappingURL=estiloMenu.css.map */
