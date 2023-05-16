@@ -25857,12 +25857,12 @@
        wrap: /*@__PURE__*/configureNesting(defaultNesting, defaultAttrs)
    });
 
+   document.getElementById("ventanaModal");
    let select = document.getElementById("ejemplos");
    let textJs;
    let elementoAnterior = "padre";
    let editorJs = new EditorView({
-     
-     extensions: [basicSetup, javascript()],
+     extensions: [basicSetup, javascript(), EditorView.editable.of(false)],
      parent: document.getElementById("editor-js")
    });
 
@@ -25882,6 +25882,27 @@
      parent: document.getElementById("editor-html")
    });
 
+   editorJs.dom.addEventListener("dblclick", ()=>{
+     const content = editorJs.state.doc.toString();
+     // Crear un elemento de entrada de texto oculto
+     const textArea = document.createElement('textarea');
+     textArea.value = content;
+     textArea.style.position = 'fixed';
+     textArea.style.opacity = '0';
+
+     // Agregar el elemento de entrada de texto al DOM
+     document.body.appendChild(textArea);
+
+     // Seleccionar y copiar el contenido del elemento de entrada de texto
+     textArea.select();
+     document.execCommand('copy');
+
+     // Eliminar el elemento de entrada de texto del DOM
+     document.body.removeChild(textArea);
+
+     alert("Contenido copiado al portapapeles");
+   });
+
    select.addEventListener("change", function() {
      var selectedOption = select.value; // Obtener el valor de la opción seleccionada
      // Actualizar el contenido del editor con el texto correspondiente a la opción seleccionada
@@ -25889,6 +25910,8 @@
        editorHtml.contentDOM.innerText = "<p class=\"Holaooooo\">hola</p>\n<p>hola</p>";
      } else if (selectedOption === "select") {
        editorHtml.contentDOM.innerText = "<select class=\"form-select form-select-lg mb-3\" aria-label=\".form-select-lg example\">\n\t<option selected>Open this select menu</option>\n\t<option value=\"1\">One</option>\n\t<option value=\"2\">Two</option>\n\t<option value=\"3\">Three</option>\n</select>";
+     } else if (selectedOption === "tabla") {
+       editorHtml.contentDOM.innerText = "<table class=\"table\">\n\t<thead>\n\t\t<tr>\n\t\t\t<th scope=\"col\">#</th>\n\t\t\t<th scope=\"col\">First</th>\n\t\t\t<th scope=\"col\">Last</th>\n\t\t\t<th scope=\"col\">Handle</th>\n\t\t</tr>\n\t</thead>\n\t<tbody>\n\t\t<tr>\n\t\t\t<th scope=\"row\">1</th>\n\t\t\t<td>Mark</td>\n\t\t\t<td>Otto</td>\n\t\t\t<td>@mdo</td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<th scope=\"row\">2</th>\n\t\t\t<td>Jacob</td>\n\t\t\t<td>Thornton</td>\n\t\t\t<td>@fat</td>\n\t\t</tr>\n\t\t<tr>\n\t\t\t<th scope=\"row\">3</th>\n\t\t\t<td colspan=\"2\">Larry the Bird</td>\n\t\t\t<td>@twitter</td>\n\t\t</tr>\n\t</tbody>\n</table>\n";
      } 
    });
 
@@ -25941,33 +25964,12 @@
        elementNode.nameElement = element.nodeName;
        elementNode.textElement = element.firstChild.textContent !== null ? element.firstChild.textContent.trim() : " ";
      
-     
        for (const attr of element.attributes) {
          elementNode[attr.nodeName] = attr.nodeValue;
        }
        return elementNode;
      }
 
-   // function createJS(objectElements) {
-   //   console.log(objectElements)
-   //   objectElements.forEach(objChild => {
-   //     console.log(objChild);
-   //     textJs =`const C${objChild.nameElement} = document.createElement('${objChild.nameElement.toLowerCase()}');\n`
-
-   //     if(objChild['class']!=undefined){
-   //       textJs += `C${objChild.nameElement}.classList.add('${objChild.class}');\n`;
-   //     }
-   //     if(objChild['textElement']!=""&& objChild['textElement']!=undefined){
-   //       textJs += `C${objChild.nameElement}.textContent('${objChild.textElement}');\n`;
-   //     }
-   //     if(objChild['visibility']!=""&& objChild['visibility']!=undefined){
-   //       textJs += `C${objChild.nameElement}.style.visibility = "visible";\n`;
-   //     }
-
-   //     textJs += `PADRE.appendChild(C${objChild.nameElement})`
-   //   });
-   //   return textJs;
-   // }
 
    function createJS(objectElements) {
      console.log(objectElements);
@@ -25997,24 +25999,25 @@
        if(propiedad ==="class"){
          textJs += `C${objeto.nameElement}.classList.add('${objeto.class}');\n`;
        }else if(propiedad ==="textElement"){
-         textJs += `C${objeto.nameElement}.textContent('${objeto.textElement}');\n`;
+         if(objeto.textElement!=""){
+           textJs += `C${objeto.nameElement}.textContent('${objeto.textElement}');\n`;
+         }
        }else if(propiedad ==="visibility"){
          textJs += `C${objeto.nameElement}.style.visibility = "visible";\n`;
        }else if(propiedad==="children"){
-         console.log(objeto[propiedad]);
-         var children = elemento[propiedad];
-         if(children.length > 0){
-           children.forEach(objChild => {
+         if(objeto[propiedad].length > 0){
+           objeto[propiedad].forEach(objChild => {
              textJs += createElement(objChild);
            });
          }
+       }else if(propiedad==="nameElement"){
+         continue;
        }else {
-         textJs += `C${objeto.nameElement}.setAttribute (\"${propiedad}\",\"${objeto.propiedad}\");\n`;
+         textJs += `C${objeto.nameElement}.setAttribute (\"${propiedad}\",\"${objeto[propiedad]}\");\n`;
        }
      }
      //creamos el arbol
      textJs += `${elementoAnterior}.appendChild(C${objeto.nameElement})\n`;
-     //elementoAnterior = `C${objeto.nameElement}`
      return textJs
    }
 
